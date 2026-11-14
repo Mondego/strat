@@ -208,3 +208,4 @@ __marimo__/
 
 # Trained ablation checkpoints (regenerate with dense-failures/run_ablation.py)
 dense-failures/results/ablation/checkpoints/
+dense-failures/results/ladder/checkpoints/
