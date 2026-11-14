@@ -67,3 +67,41 @@ flip ratio is 1 when correct and 0 when ignored; gates are in [0, 1].
 - Thresholds are set by reasoning about units, not tuned on data. If a rule turns out to
   be badly placed, any change must be dated here and reported as post hoc, with both the
   original and changed results.
+
+## Results and problems found (2026-11-14, first run on the 650 trained runs)
+
+Thresholds unchanged. Output: `results/ablation/labels.csv`, `label_summary.csv`.
+
+- **Linear Trap: 0% of runs in every config.** In-distribution, dense models do use the
+  operators: median ID flip ratio ≈ 1.0 for every dense config except Bfl (0.81) and
+  Acurr. The rule as written cannot fire. The paper's claim that A "ignores operators"
+  is contradicted by the measurement.
+- **Magnitude Leak**: 100% of Bfa and 90% of Cb runs (oracle attention: removing
+  magnitude from the gate cuts OOD MAE from ~11,800 to ~1,000 and ~160). 20–26% of A,
+  Bortho, Cg, Cbi. Cb's "Operating Point Overfit" is measured as Magnitude Leak, as
+  anticipated above.
+- **Gradient Wall: 0% of dense runs.** Bfl's median attention gradient is 0.72× Config A's,
+  not starved, and its routing argmax (0.75) matches A's (0.76).
+- **Open Gate Trap**: ≤ 16% anywhere. Median effective gates are 0.3–0.46 and equal
+  after + and −, i.e. the gates are half-open and do not switch, but the "> 0.5" rule
+  is not met.
+- **Unclassified dominates** (34–90% of dense runs).
+
+Post-hoc observation, not a pre-registered rule: 79% of dense runs have an ID flip
+ratio in [0.75, 1.25] and an OOD |flip ratio| < 0.25, i.e. they use the operator
+correctly at training scale and ignore it at OOD scale. Since their gates do not differ
+between + and −, the sign must be carried by another path. Attention is the obvious
+candidate: Q/K see D0, so attention weights depend on magnitude. Not yet tested.
+
+Flaws in the pre-registered measures, reported rather than fixed:
+
+1. **Gradient-norm comparison is scale-confounded.** Config A's attention gradients are
+   large because D0 (values up to 100) enters Q/K. STRAT-Lite's attention never sees D0,
+   so its gradients are ~1000× smaller and 4 of its 8 failed seeds (1019, 1020, 1025,
+   1036; routing argmax 0) were labelled Gradient Wall partly for that reason.
+2. **Saturation is unweighted across gate units.** In Bfl, 5 of the 6 frozen gate units
+   have zero weights and sit at σ(0) = 0.5, so median saturation reads 0.17 even though
+   the one unit that matters is saturated. The effective-gate weighting should be used.
+3. **Routing argmax has no baseline.** With the ALiBi penalty and the causal mask, the
+   immediately preceding token is favoured even without learning. Dense configs sit at
+   ~0.75 whatever their outcome; an untrained-model baseline is needed.
