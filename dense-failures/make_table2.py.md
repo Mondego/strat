@@ -19,8 +19,9 @@ not survive, so the column was replaced by three measured columns (medians over 
 
 These three were chosen because together they separate the two mechanisms found
 (magnitude-reading gate vs. fixed offset) and they are defined for every row, including
-the hand-coded reference and STRAT-Lite. The Hypothesis column was dropped for width;
-it remains in Table 9. A STRAT-Lite row was added for contrast.
+the hand-coded reference. The Hypothesis column was dropped for width;
+it remains in Table 9. No STRAT-Lite row: Table 2 sits in Section 4, before STRAT is
+introduced, and STRAT-Lite's numbers are reported in Section 5.3.
 
 ## Choices
 

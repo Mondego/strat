@@ -32,7 +32,6 @@ ROWS = [
     ('Cb',     r'C$_b$',             'Balanced'),
     ('Cbi',    r'C$_{bi}$',          'Bias Init'),
 ]
-STRAT = ('STRAT-Lite', r'STRAT-Lite', r'Sec.~\ref{sec:strat}')
 
 
 def fmt_id(v):
@@ -88,8 +87,7 @@ def build(res, att):
         if i in (4, 7):
             lines.append(r'\midrule')
         lines.append(' & '.join(row_cells(res, att, key, label, strategy)) + r' \\')
-    lines += [r'\midrule', ' & '.join(row_cells(res, att, *STRAT)) + r' \\',
-              r'\bottomrule', r'\end{tabular}%', r'}}', r'\vspace{-0.1in}', r'\end{table*}']
+    lines += [r'\bottomrule', r'\end{tabular}%', r'}}', r'\vspace{-0.1in}', r'\end{table*}']
     return '\n'.join(lines) + '\n'
 
 
