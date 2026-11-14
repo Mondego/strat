@@ -102,6 +102,7 @@ class STRATLite(nn.Module):
         scores = scores.masked_fill(mask == 1, float('-inf'))
         
         attn_weights = torch.softmax(scores, dim=-1)
+        self.last_attn = attn_weights.detach()  # read by dense-failures/probes.py
         
         V = self.W_v(x_ctrl)
         Z_ctrl = torch.matmul(attn_weights, V)
