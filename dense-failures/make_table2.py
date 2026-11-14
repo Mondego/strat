@@ -1,10 +1,11 @@
 """
-Builds the LaTeX for the paper's Table 2 (failure taxonomy) from the ablation results.
+Builds the LaTeX for the paper's Table 2 (signed-sum ablation) from the ablation results:
+error percentiles per configuration plus three measured mechanism columns.
 
-Usage: python make_table2.py [--results results/ablation/results.csv]
-                             [--out results/ablation/table2.tex]
-Reads the per-run CSV written by run_ablation.py. Writes the table to --out and prints it.
-Requires \\usepackage{booktabs} in the paper.
+Usage: python make_table2.py [--results results/ablation] [--out results/ablation/table2.tex]
+Reads <results>/results.csv (run_ablation.py) and <results>/attention_test.csv
+(attention_test.py). Writes the table to --out and prints it.
+Requires booktabs and graphicx in the paper.
 
 See make_table2.py.md.
 """
@@ -16,22 +17,22 @@ import pandas as pd
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
-# (config key in results.csv, label in paper, strategy, hypothesis, diagnosis), paper order.
-# Strategy / hypothesis / diagnosis text is copied verbatim from the submitted Table 2.
+# (config key in the CSVs, label in the paper, strategy), in paper order.
 ROWS = [
-    ('A',      'A',                       'Simplified Xformer', 'Standard Training',  'Linear Trap'),
-    ('As',     r'A\textsubscript{s}',     'A Scaled',           'Scale Invariance',   'Linear Trap'),
-    ('Aln',    r'A\textsubscript{ln}',    'LayerNorm',          'Internal Stability', 'Feature Collapse'),
-    ('Acurr',  r'A\textsubscript{curr}',  'Curriculum',         'Complexity Sched.',  'Linear Trap'),
-    ('Bfl',    r'B\textsubscript{fl}',    'Frozen Logic',       'Sharp Gates',        'Gradient Wall'),
-    ('Bfa',    r'B\textsubscript{fa}',    'Frozen Att',         'Perfect Routing',    'Magnitude Leak'),
-    ('Bortho', r'B\textsubscript{ortho}', 'Regularized',        'Orthogonality',      'Linear Trap'),
-    ('Cg',     r'C\textsubscript{g}',     'Learned Gain',       'Self-Amplification', 'Gradient Wall'),
-    ('Csb',    r'C\textsubscript{sb}',    'Signal Boost',       r'Fixed Gain ($\gamma$)', 'Gradient Wall'),
-    ('Cc',     r'B\textsubscript{c}',     'Reg + Boost',        'Synergy',            'Gradient Wall'),
-    ('Cb',     r'C\textsubscript{b}',     'Balanced',           'Operating Point',    'Operating Point Overfit'),
-    ('Cbi',    r'C\textsubscript{bi}',    'Bias Init',          'Gradient Flow',      'Open gate trap'),
+    ('A',      r'A',                 'Simplified Xformer'),
+    ('As',     r'A$_s$',             'A Scaled'),
+    ('Aln',    r'A$_{ln}$',          'LayerNorm'),
+    ('Acurr',  r'A$_{curr}^\dagger$', 'Curriculum'),
+    ('Bfl',    r'B$_{fl}$',          'Frozen Logic'),
+    ('Bfa',    r'B$_{fa}$',          'Frozen Att'),
+    ('Bortho', r'B$_{ortho}$',       'Regularized'),
+    ('Cg',     r'C$_g$',             'Learned Gain'),
+    ('Csb',    r'C$_{sb}$',          'Signal Boost'),
+    ('Cc',     r'C$_c$',             'Reg + Boost'),
+    ('Cb',     r'C$_b$',             'Balanced'),
+    ('Cbi',    r'C$_{bi}$',          'Bias Init'),
 ]
+STRAT = ('STRAT-Lite', r'STRAT-Lite', r'Sec.~\ref{sec:strat}')
 
 
 def fmt_id(v):
@@ -39,45 +40,67 @@ def fmt_id(v):
 
 
 def fmt_ood(v):
-    return f'{v:,.0f}'.replace(',', '{,}')
+    return f'{v:,.0f}'
 
 
-def build(df):
-    seeds = sorted(df.Seed.unique())
-    n = df.groupby('Config').size()
+def row_cells(res, att, key, label, strategy):
+    g, a = res[res.Config == key], att[att.Config == key]
+    idq = np.percentile(g.ID_MAE, [25, 50, 75])
+    oodq = np.percentile(g.OOD_MAE, [50, 75])
+    return [r'\textbf{' + label + '}', strategy, *map(fmt_id, idq), *map(fmt_ood, oodq),
+            f'{a.id_flip_slope.median():.2f}', f'{a.ood_flip_none.median():.2f}',
+            fmt_ood(a.ood_mae_gate.median())]
+
+
+def build(res, att):
+    seeds = sorted(res.Seed.unique())
+    n = res.groupby('Config').size()
     assert n.nunique() == 1, f'unequal runs per config: {n.to_dict()}'
     lines = [
-        r'\begin{table}[t]',
+        r'\begin{table*}[!t]',
         r'\centering',
-        r'\caption{The Failure Taxonomy ($N{=}%d$ runs/config, seeds %d--%d). We report '
-        r'25\%%-ile / Median / 75\%%-ile errors.}' % (n.iloc[0], seeds[0], seeds[-1]),
-        r'\label{tab:taxonomy}',
-        r'\resizebox{\linewidth}{!}{%',
-        r'\begin{tabular}{lll rrr rr l}',
+        r'\caption{Signed-sum ablation ($N{=}%d$ runs per configuration, seeds %d--%d). '
+        r'MAE percentiles on fixed ID and OOD sets. Measured columns (medians; App.~\ref{app:measurements}): '
+        r'\emph{ID slope}, the in-distribution effect of flipping one operator, regressed on the '
+        r'flipped operand (1: proportional, as in the correct rule; 0: a fixed offset); '
+        r'\emph{OOD flip}, the observed change in output when one operator is flipped, divided '
+        r'by the correct change (1: correct; 0: operator ignored); \emph{Gate abl.}, OOD MAE when '
+        r'the gate receives the input it would get if every operand were 50.5. '
+        r'$^\dagger$A$_{curr}$ trains on operands up to 5,000, so 50.5 is not a typical operand '
+        r'for it and its ID slope and gate ablation are not comparable with the other rows.}'
+        % (n.iloc[0], seeds[0], seeds[-1]),
+        r'\label{tab:failures}',
+        r'\vspace{-0.1in}',
+        r'\resizebox{\textwidth}{!}{%',
+        r'{\scriptsize',
+        r'\begin{tabular}{l l ccc cc ccc}',
         r'\toprule',
-        r' & & & \multicolumn{3}{c}{ID MAE (Train)} & \multicolumn{2}{c}{OOD MAE (Test)} & \\',
-        r'\cmidrule(lr){4-6} \cmidrule(lr){7-8}',
-        r'Cfg & Strategy & Hypothesis & 25\% & Med & 75\% & Med & 75\% & Diagnosis / Mechanism \\',
+        r'& & \multicolumn{3}{c}{\textbf{ID MAE}} & \multicolumn{2}{c}{\textbf{OOD MAE}} '
+        r'& \multicolumn{3}{c}{\textbf{Measured mechanism}} \\',
+        r'\cmidrule(lr){3-5} \cmidrule(lr){6-7} \cmidrule(lr){8-10}',
+        r'\textbf{Cfg} & \textbf{Strategy} & \textbf{25\%} & \textbf{Med} & \textbf{75\%} '
+        r'& \textbf{Med} & \textbf{75\%} & \textbf{ID slope} & \textbf{OOD flip} & \textbf{Gate abl.} \\',
         r'\midrule',
-        r'Ref & Hand-Coded & Existence Proof & 0.0 & 0.0 & 0.0 & 0 & 0 & Geometric Logic \\',
+        r'\textbf{Ref} & Hand-Coded & 0.0 & 0.0 & 0.0 & 0 & 0 & 1.00 & 1.00 & 0 \\',
         r'\midrule',
     ]
-    for key, label, strategy, hypothesis, diagnosis in ROWS:
-        g = df[df.Config == key]
-        idq = np.percentile(g.ID_MAE, [25, 50, 75])
-        oodq = np.percentile(g.OOD_MAE, [50, 75])
-        cells = [label, strategy, hypothesis, *map(fmt_id, idq), *map(fmt_ood, oodq), diagnosis]
-        lines.append(' & '.join(cells) + r' \\')
-    lines += [r'\bottomrule', r'\end{tabular}}', r'\end{table}']
+    for i, (key, label, strategy) in enumerate(ROWS):
+        if i in (4, 7):
+            lines.append(r'\midrule')
+        lines.append(' & '.join(row_cells(res, att, key, label, strategy)) + r' \\')
+    lines += [r'\midrule', ' & '.join(row_cells(res, att, *STRAT)) + r' \\',
+              r'\bottomrule', r'\end{tabular}%', r'}}', r'\vspace{-0.1in}', r'\end{table*}']
     return '\n'.join(lines) + '\n'
 
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument('--results', default=os.path.join(HERE, 'results', 'ablation', 'results.csv'))
+    ap.add_argument('--results', default=os.path.join(HERE, 'results', 'ablation'))
     ap.add_argument('--out', default=os.path.join(HERE, 'results', 'ablation', 'table2.tex'))
     args = ap.parse_args()
-    tex = build(pd.read_csv(args.results))
+    res = pd.read_csv(os.path.join(args.results, 'results.csv'))
+    att = pd.read_csv(os.path.join(args.results, 'attention_test.csv'))
+    tex = build(res, att)
     with open(args.out, 'w') as f:
         f.write(tex)
     print(tex)
