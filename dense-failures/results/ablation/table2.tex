@@ -1,0 +1,28 @@
+\begin{table}[t]
+\centering
+\caption{The Failure Taxonomy ($N{=}50$ runs/config, seeds 1000--1049). We report 25\%-ile / Median / 75\%-ile errors.}
+\label{tab:taxonomy}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{lll rrr rr l}
+\toprule
+ & & & \multicolumn{3}{c}{ID MAE (Train)} & \multicolumn{2}{c}{OOD MAE (Test)} & \\
+\cmidrule(lr){4-6} \cmidrule(lr){7-8}
+Cfg & Strategy & Hypothesis & 25\% & Med & 75\% & Med & 75\% & Diagnosis / Mechanism \\
+\midrule
+Ref & Hand-Coded & Existence Proof & 0.0 & 0.0 & 0.0 & 0 & 0 & Geometric Logic \\
+\midrule
+A & Simplified Xformer & Standard Training & 7.6 & 33.7 & 41.6 & 6{,}571 & 9{,}425 & Linear Trap \\
+A\textsubscript{s} & A Scaled & Scale Invariance & 26.8 & 42.1 & 51.3 & 5{,}313 & 5{,}752 & Linear Trap \\
+A\textsubscript{ln} & LayerNorm & Internal Stability & 12.7 & 20.5 & 26.9 & 7{,}677 & 8{,}920 & Feature Collapse \\
+A\textsubscript{curr} & Curriculum & Complexity Sched. & 426.1 & 752.4 & 1327.5 & 2{,}526 & 2{,}995 & Linear Trap \\
+B\textsubscript{fl} & Frozen Logic & Sharp Gates & 42.9 & 62.0 & 69.7 & 6{,}262 & 6{,}913 & Gradient Wall \\
+B\textsubscript{fa} & Frozen Att & Perfect Routing & 4.2 & 6.1 & 8.2 & 11{,}833 & 13{,}194 & Magnitude Leak \\
+B\textsubscript{ortho} & Regularized & Orthogonality & 6.7 & 33.3 & 43.1 & 6{,}628 & 10{,}341 & Linear Trap \\
+C\textsubscript{g} & Learned Gain & Self-Amplification & 6.8 & 30.2 & 43.4 & 7{,}519 & 11{,}100 & Gradient Wall \\
+C\textsubscript{sb} & Signal Boost & Fixed Gain ($\gamma$) & 47.7 & 48.3 & 53.2 & 5{,}373 & 5{,}712 & Gradient Wall \\
+B\textsubscript{c} & Reg + Boost & Synergy & 42.5 & 48.2 & 53.1 & 5{,}364 & 6{,}007 & Gradient Wall \\
+C\textsubscript{b} & Balanced & Operating Point & 1.2 & 1.7 & 2.6 & 11{,}537 & 11{,}679 & Operating Point Overfit \\
+C\textsubscript{bi} & Bias Init & Gradient Flow & 8.6 & 33.5 & 41.4 & 6{,}280 & 10{,}221 & Open gate trap \\
+\bottomrule
+\end{tabular}}
+\end{table}
