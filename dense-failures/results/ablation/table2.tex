@@ -1,32 +1,32 @@
 \begin{table*}[!t]
 \centering
-\caption{Signed-sum ablation ($N{=}50$ runs per configuration, seeds 1000--1049). MAE percentiles on fixed ID and OOD sets. Measured columns (medians; App.~\ref{app:measurements}): \emph{ID slope}, the in-distribution effect of flipping one operator, regressed on the flipped operand (1: proportional, as in the correct rule; 0: a fixed offset); \emph{OOD flip}, the observed change in output when one operator is flipped, divided by the correct change (1: correct; 0: operator ignored); \emph{Gate abl.}, OOD MAE when the gate receives the input it would get if every operand were 50.5. $^\dagger$A$_{curr}$ trains on operands up to 5,000, so 50.5 is not a typical operand for it and its ID slope and gate ablation are not comparable with the other rows.}
+\caption{Signed-sum ablation ($N{=}50$ runs per configuration, seeds 1000--1049). MAE percentiles on fixed ID and OOD sets. Measured columns (medians; App.~\ref{app:measurements}): \emph{ID flip} and \emph{OOD flip}, the observed change in output when one operator is flipped, divided by the correct change, on the ID and OOD sets (1: correct; 0: operator ignored); \emph{ID slope}, the in-distribution effect of flipping one operator, regressed on the flipped operand (1: proportional, as in the correct rule; 0: a fixed offset); \emph{Gate abl.}, OOD MAE when the gate receives the input it would get if every operand were 50.5. $^\dagger$A$_{curr}$ trains on operands up to 5,000, so 50.5 is not a typical operand for it, and the ID set covers only the low end of its training range; its ID flip, ID slope and gate ablation are not comparable with the other rows.}
 \label{tab:failures}
 \vspace{-0.1in}
 \resizebox{\textwidth}{!}{%
 {\scriptsize
-\begin{tabular}{l l ccc cc ccc}
+\begin{tabular}{l l ccc cc cccc}
 \toprule
-& & \multicolumn{3}{c}{\textbf{ID MAE}} & \multicolumn{2}{c}{\textbf{OOD MAE}} & \multicolumn{3}{c}{\textbf{Measured mechanism}} \\
-\cmidrule(lr){3-5} \cmidrule(lr){6-7} \cmidrule(lr){8-10}
-\textbf{Cfg} & \textbf{Strategy} & \textbf{25\%} & \textbf{Med} & \textbf{75\%} & \textbf{Med} & \textbf{75\%} & \textbf{ID slope} & \textbf{OOD flip} & \textbf{Gate abl.} \\
+& & \multicolumn{3}{c}{\textbf{ID MAE}} & \multicolumn{2}{c}{\textbf{OOD MAE}} & \multicolumn{4}{c}{\textbf{Measured mechanism}} \\
+\cmidrule(lr){3-5} \cmidrule(lr){6-7} \cmidrule(lr){8-11}
+\textbf{Cfg} & \textbf{Strategy} & \textbf{25\%} & \textbf{Med} & \textbf{75\%} & \textbf{Med} & \textbf{75\%} & \textbf{ID flip} & \textbf{OOD flip} & \textbf{ID slope} & \textbf{Gate abl.} \\
 \midrule
-\textbf{Ref} & Hand-Coded & 0.0 & 0.0 & 0.0 & 0 & 0 & 1.00 & 1.00 & 0 \\
+\textbf{Ref} & Hand-Coded & 0.0 & 0.0 & 0.0 & 0 & 0 & 1.00 & 1.00 & 1.00 & 0 \\
 \midrule
-\textbf{A} & Simplified Xformer & 7.6 & 33.7 & 41.6 & 6,571 & 9,425 & 0.40 & 0.06 & 4,743 \\
-\textbf{A$_s$} & A Scaled & 26.8 & 42.1 & 51.3 & 5,313 & 5,752 & 0.30 & 0.04 & 5,353 \\
-\textbf{A$_{ln}$} & LayerNorm & 12.7 & 20.5 & 26.9 & 7,677 & 8,920 & 0.77 & 0.03 & 7,663 \\
-\textbf{A$_{curr}^\dagger$} & Curriculum & 426.1 & 752.4 & 1327.5 & 2,526 & 2,995 & -0.04 & 0.65 & 4,207 \\
+\textbf{A} & Simplified Xformer & 7.6 & 33.7 & 41.6 & 6,571 & 9,425 & 0.99 & 0.06 & 0.40 & 4,743 \\
+\textbf{A$_s$} & A Scaled & 26.8 & 42.1 & 51.3 & 5,313 & 5,752 & 0.97 & 0.04 & 0.30 & 5,353 \\
+\textbf{A$_{ln}$} & LayerNorm & 12.7 & 20.5 & 26.9 & 7,677 & 8,920 & 1.01 & 0.03 & 0.77 & 7,663 \\
+\textbf{A$_{curr}^\dagger$} & Curriculum & 426.1 & 752.4 & 1327.5 & 2,526 & 2,995 & 5.03 & 0.65 & -0.04 & 4,207 \\
 \midrule
-\textbf{B$_{fl}$} & Frozen Logic & 42.9 & 62.0 & 69.7 & 6,262 & 6,913 & 0.05 & 0.31 & 6,172 \\
-\textbf{B$_{fa}$} & Frozen Att & 4.2 & 6.1 & 8.2 & 11,833 & 13,194 & 1.00 & 0.00 & 989 \\
-\textbf{B$_{ortho}$} & Regularized & 6.7 & 33.3 & 43.1 & 6,628 & 10,341 & 0.49 & 0.02 & 4,908 \\
+\textbf{B$_{fl}$} & Frozen Logic & 42.9 & 62.0 & 69.7 & 6,262 & 6,913 & 0.81 & 0.31 & 0.05 & 6,172 \\
+\textbf{B$_{fa}$} & Frozen Att & 4.2 & 6.1 & 8.2 & 11,833 & 13,194 & 0.99 & 0.00 & 1.00 & 989 \\
+\textbf{B$_{ortho}$} & Regularized & 6.7 & 33.3 & 43.1 & 6,628 & 10,341 & 0.99 & 0.02 & 0.49 & 4,908 \\
 \midrule
-\textbf{C$_g$} & Learned Gain & 6.8 & 30.2 & 43.4 & 7,519 & 11,100 & 0.44 & 0.01 & 4,888 \\
-\textbf{C$_{sb}$} & Signal Boost & 47.7 & 48.3 & 53.2 & 5,373 & 5,712 & 0.01 & 0.01 & 5,274 \\
-\textbf{C$_c$} & Reg + Boost & 42.5 & 48.2 & 53.1 & 5,364 & 6,007 & 0.01 & 0.02 & 5,214 \\
-\textbf{C$_b$} & Balanced & 1.2 & 1.7 & 2.6 & 11,537 & 11,679 & 1.00 & 0.00 & 156 \\
-\textbf{C$_{bi}$} & Bias Init & 8.6 & 33.5 & 41.4 & 6,280 & 10,221 & 0.45 & 0.04 & 5,026 \\
+\textbf{C$_g$} & Learned Gain & 6.8 & 30.2 & 43.4 & 7,519 & 11,100 & 1.00 & 0.01 & 0.44 & 4,888 \\
+\textbf{C$_{sb}$} & Signal Boost & 47.7 & 48.3 & 53.2 & 5,373 & 5,712 & 0.96 & 0.01 & 0.01 & 5,274 \\
+\textbf{C$_c$} & Reg + Boost & 42.5 & 48.2 & 53.1 & 5,364 & 6,007 & 0.98 & 0.02 & 0.01 & 5,214 \\
+\textbf{C$_b$} & Balanced & 1.2 & 1.7 & 2.6 & 11,537 & 11,679 & 1.00 & 0.00 & 1.00 & 156 \\
+\textbf{C$_{bi}$} & Bias Init & 8.6 & 33.5 & 41.4 & 6,280 & 10,221 & 0.99 & 0.04 & 0.45 & 5,026 \\
 \bottomrule
 \end{tabular}%
 }}
