@@ -1,11 +1,9 @@
 <p align="center">
-  <img src="assets/strat-banner.png" alt="STRAT: STratified Registers And Types" width="300">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/strat-banner-dark.png">
+    <img src="assets/strat-banner.png" alt="STRAT (STratified Registers And Types). The Geometry of Logic: Stratification Induces Semantic Structure and Robust Reasoning" width="600">
+  </picture>
 </p>
-
-<h2 align="center">
-  The Geometry of Logic: Stratification Induces<br>
-  Semantic Structure and Robust Reasoning
-</h2>
 
 <p align="center">
   Rethinking the Transformer: separate subspaces for data and control.
