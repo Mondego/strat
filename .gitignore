@@ -209,3 +209,7 @@ __marimo__/
 # Trained ablation checkpoints (regenerate with dense-failures/run_ablation.py)
 dense-failures/results/ablation/checkpoints/
 dense-failures/results/ladder/checkpoints/
+
+# multitask: code and data are versioned; trained models and results stay local.
+multitask/**/results/
+multitask/checkpoints/
