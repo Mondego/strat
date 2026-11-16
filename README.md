@@ -1,9 +1,14 @@
 <p align="center">
-  <img src="assets/strat-banner.png" alt="STRAT: STratified Registers And Types" width="290">
+  <img src="assets/strat-banner.png" alt="STRAT: STratified Registers And Types" width="300">
 </p>
 
+<h2 align="center">
+  The Geometry of Logic: Stratification Induces<br>
+  Semantic Structure and Robust Reasoning
+</h2>
+
 <p align="center">
-  A Transformer architecture that separates data from control.
+  Rethinking the Transformer: separate subspaces for data and control.
 </p>
 
 <p align="center">
@@ -14,7 +19,6 @@
 
 <p align="center">
   <a href="#overview">Overview</a> ·
-  <a href="#results">Results</a> ·
   <a href="#repository-layout">Repository layout</a> ·
   <a href="#quick-start">Quick start</a>
 </p>
@@ -28,21 +32,6 @@ STRAT partitions the residual stream of a Transformer into two orthogonal subspa
 </p>
 <p align="center">
   <i>The STRAT block on the arithmetic example 12 + 3 − 5. Type (blue) drives attention and the gate; the gated transform is added back to Data (orange).</i>
-</p>
-
-## Results
-
-STRAT and a Transformer baseline train from the same 10 base examples per dataset, with the same task-specific augmentation where a task has one.
-
-- On 11 datasets that cover 10 tasks, STRAT has the higher mean accuracy on every dataset, by 26 percentage points on average.
-- Under distribution shift, the mean accuracy of STRAT drops by 2.39 percentage points, against 11.75 for the Transformer.
-- In arithmetic, STRAT reduces the median out-of-distribution error 35-fold relative to the Transformer baseline.
-
-<p align="center">
-  <img src="assets/results.png" alt="Accuracy of STRAT and the Transformer on 11 datasets" width="95%">
-</p>
-<p align="center">
-  <i>(a) Accuracy on the 11 datasets, mean ± SEM over 10 paired seeds. (b) Macro-average accuracy in distribution (ID) and out of distribution (OOD).</i>
 </p>
 
 ## Repository layout
