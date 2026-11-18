@@ -63,12 +63,13 @@ def build(res, att, prb):
         r'MAE percentiles on fixed ID and OOD sets. Measured columns (medians; App.~\ref{app:measurements}): '
         r'\emph{ID flip} and \emph{OOD flip}, the observed change in output when one operator is '
         r'flipped, divided by the correct change, on the ID and OOD sets (1: correct; 0: operator '
-        r'ignored); \emph{ID slope}, the in-distribution effect of flipping one operator, regressed on the '
+        r'ignored); \emph{Flip slope}, the in-distribution effect of flipping one operator, regressed on the '
         r'flipped operand (1: proportional, as in the correct rule; 0: a fixed offset); \emph{Gate abl.}, OOD MAE when '
         r'the gate receives the input it would get if every operand were 50.5. '
-        r'$^\dagger$A$_{curr}$ trains on operands up to 5,000, so 50.5 is not a typical operand '
-        r'for it, and the ID set covers only the low end of its training range; its ID flip, ID slope '
-        r'and gate ablation are not comparable with the other rows.}'
+        r'$^\dagger$A$_{curr}$ trains on operands up to 5,000, so its OOD set lies within its '
+        r'training range, its ID set covers only the low end of that range, and 50.5 is not a '
+        r'typical operand for it. Its OOD MAE, ID flip, flip slope and gate ablation are not '
+        r'comparable with the other rows.}'
         % (n.iloc[0], seeds[0], seeds[-1]),
         r'\label{tab:failures}',
         r'\vspace{-0.1in}',
@@ -80,7 +81,7 @@ def build(res, att, prb):
         r'& \multicolumn{4}{c}{\textbf{Measured mechanism}} \\',
         r'\cmidrule(lr){3-5} \cmidrule(lr){6-7} \cmidrule(lr){8-11}',
         r'\textbf{Cfg} & \textbf{Strategy} & \textbf{25\%} & \textbf{Med} & \textbf{75\%} '
-        r'& \textbf{Med} & \textbf{75\%} & \textbf{ID flip} & \textbf{OOD flip} & \textbf{ID slope} & \textbf{Gate abl.} \\',
+        r'& \textbf{Med} & \textbf{75\%} & \textbf{ID flip} & \textbf{OOD flip} & \textbf{Flip slope} & \textbf{Gate abl.} \\',
         r'\midrule',
         r'\textbf{Ref} & Hand-Coded & 0.0 & 0.0 & 0.0 & 0 & 0 & 1.00 & 1.00 & 1.00 & 0 \\',
         r'\midrule',

@@ -125,7 +125,8 @@ SELFTEST_EXPECT = {   # model: {column: (low, high)}
     'gate_leak':      {'ood_flip_none': (-.01, .01), 'ood_flip_qk': (-.01, .01),
                        'ood_flip_gate': (.99, 1.01), 'ood_mae_gate': (0, 1e-3)},
     'attention_leak': {'id_mae_none': (0, 1e-3), 'ood_flip_none': (-.01, .01),
-                       'ood_flip_qk': (.99, 1.01), 'ood_mae_qk': (0, 1e-3)},
+                       'ood_flip_qk': (.99, 1.01), 'ood_mae_qk': (0, 1e-3),
+                       'ood_flip_gate': (.99, 1.01), 'ood_mae_gate': (0, 1e-3)},
 }
 
 

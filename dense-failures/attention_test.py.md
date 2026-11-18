@@ -32,6 +32,16 @@ reads magnitude is fixed by the gate condition and not by Q/K; a query that weak
 magnitude (W_q[4, 0] = −0.01, so routing fails at OOD scale) is fixed by Q/K; a pure
 offset model gives slope 0 and intercept 50.5.
 
+**The gate ablation also fixes the attention-leak model** (checked 2026-11-18, now in the
+self-test). Its first pass records the gate input with every operand at 50.5, and that
+input includes the flags attention copies to the number; with operands at 50.5 the
+routing works, so the gate receives the correct flags. The two ablations are therefore not
+symmetric: Q/K repairs only the attention-leak model, while the gate ablation repairs both.
+A recovery under the gate ablation means operand magnitude reaches the gate input, directly
+or through attention (weights or values); only the Q/K ablation isolates the attention
+weights. An earlier version of the paper (B.4) said each ablation repaired only the model
+whose path it targets; that was not tested and is false for the gate ablation.
+
 ## Results (2026-11-14, 650 runs; medians per config)
 
 - **Q/K ablation changes nothing.** OOD flip ratio stays at 0.00–0.06 in every dense config.
@@ -53,8 +63,16 @@ restorable, by construction). For A, Bortho, Cg and Cbi, the restored OOD flip r
 **Not explained.** As and Aln have a proportional part (slope 0.30 and 0.77) that the gate
 ablation does not restore, so their failure runs through another path. A plausible one
 for Aln is LayerNorm on the residual shrinking the operator flags at large magnitude
-(untested). Across individual dense runs, slope and gate-restored flip correlate only
-at r = 0.37, so the decomposition is a configuration-level description, not a per-run law.
+(untested).
+
+**Per-run correlation (corrected 2026-11-18).** An earlier version reported that slope and
+gate-restored OOD flip correlate only at r = 0.37 across individual dense runs, and
+concluded that the decomposition holds for configurations, not runs. That r included
+Acurr, whose slope and ablation are not comparable (slope −0.04, restored flip 0.62), and
+it drove the value down. Over the 200 runs of A, Bortho, Cg and Cbi, r = 0.61 (Spearman
+0.63), and 0.52–0.69 within each configuration; over the 550 dense runs without Acurr,
+r = 0.68. The restored flip is below the slope in 70% of those 200 runs (median
+difference −0.10). The decomposition therefore also holds, less tightly, per run.
 
 **Acurr caveat.** Acurr trains on operands up to 5000, so 50.5 is not its typical operand
 and its ablations are not comparable. Its in-distribution slope (−0.04, intercept 273)

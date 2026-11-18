@@ -103,5 +103,12 @@ Flaws in the pre-registered measures, reported rather than fixed:
    have zero weights and sit at σ(0) = 0.5, so median saturation reads 0.17 even though
    the one unit that matters is saturated. The effective-gate weighting should be used.
 3. **Routing argmax has no baseline.** With the ALiBi penalty and the causal mask, the
-   immediately preceding token is favoured even without learning. Dense configs sit at
-   ~0.75 whatever their outcome; an untrained-model baseline is needed.
+   immediately preceding token is favoured even without learning. A, Acurr, Bfl, Bortho,
+   Cg and Cbi sit at a median of 0.75–0.76 whatever their outcome; an untrained-model
+   baseline is needed. (Corrected 2026-11-18: an earlier version said all dense configs
+   sit at ~0.75. Aln is 0.65, Bfa and Cb are fixed at 1.00, and As, Csb and Cc are 0.00.)
+4. **Csb and Cc nearly meet Gradient Wall** (checked 2026-11-18). In 80% of Csb runs and
+   70% of Cc runs, routing argmax < 0.5 and median gate saturation > 0.9; only the
+   gradient condition fails, with median attention gradient 37× and 23× Config A's. The
+   attention gain multiplies that gradient (100 in Csb, init 50 in Cc); divided by it the
+   ratio is still ≈ 0.4–0.5, above the 0.1 threshold.

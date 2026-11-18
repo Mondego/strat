@@ -12,7 +12,8 @@ The first version kept the submitted "Diagnosis / Mechanism" column verbatim. Af
 mechanism probes (`label_runs.py.md`, `attention_test.py.md`) most of those diagnoses did
 not survive, so the column was replaced by measured columns (medians over seeds):
 
-- **ID slope**: slope of the in-distribution operator-flip effect regressed on the flipped
+- **Flip slope** (column named "ID slope" until 2026-11-18; renamed to match the
+  paper text): slope of the in-distribution operator-flip effect regressed on the flipped
   operand (1 = proportional, as in the correct rule; ≈ 0 = fixed offset).
 - **OOD flip**: median flip ratio at OOD (1 = operator used correctly; 0 = ignored).
 - **Gate abl.**: OOD MAE when the gate receives its mean-operand input.
@@ -36,6 +37,8 @@ introduced, and STRAT-Lite's numbers are reported in Section 5.3.
 - **"Bc" renamed C$_c$**, matching Appendix B.
 - **A$_{curr}$ marked with a dagger.** It trains on operands up to 5000, so the 50.5
   reference used by the slope regression and the gate ablation is not typical for it, and
-  the ID set (operands in ID_RANGE) covers only the low end of its training range. Its
+  the ID set (operands in ID_RANGE) covers only the low end of its training range. Its OOD set
+  ([2000, 5000]) lies inside its training range, so its OOD MAE is not an OOD error
+  (added to the caption 2026-11-18). Its
   median ID flip ratio is 5.03.
 - Requires `booktabs`, and `graphicx` for `\resizebox` (both loaded by the paper).
